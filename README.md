@@ -18,7 +18,19 @@ The main requirement for git plugins is that the name of the shell script should
 
 Now, you only need to put the script in `/usr/local/bin` or somewhere similar in your `$PATH` and thats it !
 
-![beam-it setup](https://dl.dropboxusercontent.com/u/5258344/Blog/git-beam-it%20setup.gif)
+#### One-liner Installations
+
+Installation with `curl`:
+
+```bash
+curl -L -O https://raw.githubusercontent.com/ahmadassaf/git-beam-it/master/git-beam-it && mv git-beam-it /usr/local/bin/ && chmod +x /usr/local/bin/git-beam-it
+```
+
+Installation with `wget`:
+
+```bash
+wget -P /usr/local/bin https://raw.githubusercontent.com/ahmadassaf/git-beam-it/master/git-beam-it && chmod +x /usr/local/bin/git-beam-i
+```
 
 > Note: After first setup, you might need to source your .bash_profile, .bashrc or .zshrc in order for the variables export to take effect and not to be prompted again
 
@@ -36,6 +48,8 @@ Options:
 ```
 
 If the paramteres `-t` and `-o` have been left empty, then the script will fetch the list of ogranisations and teams for that specific user, the user will then be prompted to enter the organisation name or team id or just skip to fetch all repositories.
+
+![beam-it setup](https://dl.dropboxusercontent.com/u/5258344/Blog/git-beam-it%20setup.gif)
 
 ### Examples:
 
