@@ -29,7 +29,7 @@ curl -L -O https://raw.githubusercontent.com/ahmadassaf/git-beam-it/master/git-b
 Installation with `wget`:
 
 ```bash
-wget -P /usr/local/bin https://raw.githubusercontent.com/ahmadassaf/git-beam-it/master/git-beam-it && chmod +x /usr/local/bin/git-beam-i
+wget -P /usr/local/bin https://raw.githubusercontent.com/ahmadassaf/git-beam-it/master/git-beam-it && chmod +x /usr/local/bin/git-beam-it
 ```
 
 > Note: After first setup, you might need to source your .bash_profile, .bashrc or .zshrc in order for the variables export to take effect and not to be prompted again
