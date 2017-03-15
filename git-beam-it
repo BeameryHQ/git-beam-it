@@ -71,8 +71,10 @@ set_environment_variable() {
 
     # Check if we have a .zshrc regardless of the os .. and copy that to the zsh source file
     if [[ -f "$HOME/.zshrc" ]]; then
-        printf "Noticed that you have Zsh installed .. adding ${1} variable in there .."
-        printf "\nexport ${1}=${2}" >> "${HOME}/.zshrc"
+        if ! grep -q "export ${1}=${2}" "${HOME}/.zshrc" ; then
+          printf "Noticed that you have Zsh installed .. adding ${1} variable in there ..\n"
+          printf "\nexport ${1}=${2}" >> "${HOME}/.zshrc"
+        fi
     fi
 }
 
