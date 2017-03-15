@@ -27,13 +27,13 @@ Now, you only need to put the script in `/usr/local/bin` or somewhere similar in
 Installation with `curl`:
 
 ```bash
-curl -L -O https://raw.githubusercontent.com/ahmadassaf/git-beam-it/master/git-beam-it && mv git-beam-it /usr/local/bin/ && chmod +x /usr/local/bin/git-beam-it
+curl -L -O https://raw.githubusercontent.com/SeedJobs/git-beam-it/master/git-beam-it && mv git-beam-it /usr/local/bin/ && chmod +x /usr/local/bin/git-beam-it
 ```
 
 Installation with `wget`:
 
 ```bash
-wget -P /usr/local/bin https://raw.githubusercontent.com/ahmadassaf/git-beam-it/master/git-beam-it && chmod +x /usr/local/bin/git-beam-it
+wget -P /usr/local/bin https://raw.githubusercontent.com/SeedJobs/git-beam-it/master/git-beam-it && chmod +x /usr/local/bin/git-beam-it
 ```
 
 > Note: After first setup, you might need to source your .bash_profile, .bashrc or .zshrc in order for the variables export to take effect and not to be prompted again
@@ -42,10 +42,10 @@ wget -P /usr/local/bin https://raw.githubusercontent.com/ahmadassaf/git-beam-it/
 Usage: beamit <options>
 
 Options:
--h        	   help            show help
--i        	   interactive     interactive clone mode. The user will be prompted before cloning each repo
+-h             help            show help
+-i             interactive     interactive clone mode. The user will be prompted before cloning each repo
 -p             pulbic          clone only public repositories (note that this does not work for teams)
--v        	   private         clone only private repositories (note that this does not work for teams)
+-v             private         clone only private repositories (note that this does not work for teams)
 -r             regex           filter repositories based on this regex
 -t <teamId>    team            clone only repositories belonging to this specific team id
 -o <orgName>   organisation    clone only repositories belonging to this specific organisation name
