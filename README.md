@@ -27,13 +27,13 @@ Now, you only need to put the script in `/usr/local/bin` or somewhere similar in
 Installation with `curl`:
 
 ```bash
-curl -L -O https://raw.githubusercontent.com/SeedJobs/git-beam-it/master/git-beam-it && mv git-beam-it /usr/local/bin/ && chmod +x /usr/local/bin/git-beam-it
+curl -L -O https://raw.githubusercontent.com/SeedJobs/git-beam-it/master/git-beam-it && sudo mv git-beam-it /usr/local/bin/ && sudo chmod +x /usr/local/bin/git-beam-it
 ```
 
 Installation with `wget`:
 
 ```bash
-wget -P /usr/local/bin https://raw.githubusercontent.com/SeedJobs/git-beam-it/master/git-beam-it && chmod +x /usr/local/bin/git-beam-it
+sudo wget -P /usr/local/bin https://raw.githubusercontent.com/SeedJobs/git-beam-it/master/git-beam-it && sudo chmod +x /usr/local/bin/git-beam-it
 ```
 
 > Note: After first setup, you might need to source your .bash_profile, .bashrc or .zshrc in order for the variables export to take effect and not to be prompted again
