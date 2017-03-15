@@ -1,6 +1,6 @@
 The MIT License (MIT)
 
-Copyright (c) 2017 Ahmad Assaf<me@ahmadassaf.com>
+Copyright (c) 2017 Beamery Ltd. <ahmad@beamery.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

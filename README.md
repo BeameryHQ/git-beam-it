@@ -10,6 +10,10 @@ The script will automatically configure itself by asking the user to enter some 
 
 When running the script for the first time, the user will be prompted to enter his Github username and API personal access token. For more information on API personal access tokens, check this [Github tutorial](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/)
 
+## Repositories Refresh
+
+When cloning, if the repository already exists then the script will perfrom a `git pull` assuming that the remote is `origin` and will update the local `master branch
+
 ## Installation
 
 You can use the script `git-beam-it.sh` by exporting that into your .`bash_profile`, `.bashrc` or `.zshrc` and then make sure that it is executable with `chmod +x git-beam-it.sh`. However, the recommended way to use it is by registering it as a git plugin.
