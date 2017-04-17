@@ -48,6 +48,14 @@ die () {
     exit 1
 }
 
+# Check if gawk is installed which is not by default in mac systems
+if ! type gawk &> /dev/null ; then
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        printf "The required package ${YELLOW}gawk${NC} was not found .. installing now\n"
+        brew install gawk
+    fi
+fi
+
 check_jq() {
 	if ! type jq &> /dev/null ; then
 	    if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -109,7 +117,7 @@ get_teams() {
 get_organisations() {
 	check_jq
 	printf "We have noticed that you have specified the organisation ${YELLOW}-o${NC} flag, but have not defined an organisation\nHere are a list of your organisations in case you did not know them:\n${MAGENTA}"
-	curl --silent https://api.github.com/user/orgs?access_token=$GITRIEVAL_TOKEN  | sed 's/\\\\\//\//g' | sed 's/[{}]//g' | awk -v k="text" '{n=split($0,a,","); for (i=1; i<=n; i++) print a[i]}' | sed 's/\"\:\"/\|/g' | sed 's/[\,]/ /g' | sed 's/\"//g' | grep -w login | cut -d "|" -f2
+	curl --silent https://api.github.com/user/orgs?access_token=$GITRIEVAL_TOKEN  | sed 's/\\\\\//\//g' | sed 's/[{}]//g' | gawk -v k="text" '{n=split($0,a,","); for (i=1; i<=n; i++) print a[i]}' | sed 's/\"\:\"/\|/g' | sed 's/[\,]/ /g' | sed 's/\"//g' | grep -w login | cut -d "|" -f2
 	printf "${NC}Press ${YELLOW}[ENTER]${NC} to skip the organisation flag and fetch all repositories for the user\n"
 	read -p "Which organisation you wish to fetch repositories for: ? " -e ORGANISATION
 }
@@ -189,7 +197,7 @@ get_repos() {
 request_github_api() {
 	GITHUB_PAGE=1
 	until [[ $IS_PAGINATED == false ]]; do
-		REPOS=$(curl --silent -i -H "Authorization: token ${GITRIEVAL_TOKEN}" "https://api.github.com/${1}&per_page=100&page=${GITHUB_PAGE}" | awk -v RS=',"' -F: '/^clone_url/ {print $3}' | sed 's/["]//g' | cut -c 3-)
+		REPOS=$(curl --silent -i -H "Authorization: token ${GITRIEVAL_TOKEN}" "https://api.github.com/${1}&per_page=100&page=${GITHUB_PAGE}" | gawk -v RS=',"' -F: '/^clone_url/ {print $3}' | sed 's/["]//g' | cut -c 3-)
 		REPOLIST+="\n${REPOS}"
 		printf "Retrieving batch: ${GITHUB_PAGE} of repositores --> ${YELLOW} `echo "$REPOLIST" | wc -l` ${NC} processed so far\n"
 		if [[ -n $REPOS ]]; then
