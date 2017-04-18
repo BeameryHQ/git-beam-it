@@ -14,11 +14,12 @@
 # Usage: git beam-it <options>
 #
 # Options:
-# -h   		help 		show help
-# -i 		interactive     interactive clone mode. The user will be prompted before cloning each repo
-# -p        	pulbic          clone only public repositories (note that this does not work for teams)
-# -v 		private         clone only private repositories (note that this does not work for teams)
-# -r        	regex           filter repositories based on this regex
+# -h             help            show help
+# -i             interactive     interactive clone mode. The user will be prompted before cloning each repo
+# -d             directory       specify a directory to clone all the repositories into
+# -p             pulbic          clone only public repositories (note that this does not work for teams)
+# -v             private         clone only private repositories (note that this does not work for teams)
+# -r             regex           filter repositories based on this regex
 # -t <teamId>    team            clone only repositories belonging to this specific team id
 # -o <orgName>   organisation    clone only repositories belonging to this specific organisation name
 #
@@ -57,13 +58,13 @@ if ! type gawk &> /dev/null ; then
 fi
 
 check_jq() {
-	if ! type jq &> /dev/null ; then
-	    if [[ "$OSTYPE" == "darwin"* ]]; then
-	        brew 2>/dev/null && /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-	    fi
-	    printf "The required package ${YELLOW}jq${NC} was not found .. installing now\n"
-	    [[ "$OSTYPE" == "linux-gnu" ]] && sudo apt-get install jq || brew install jq
-	fi
+    if ! type jq &> /dev/null ; then
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            brew 2>/dev/null && /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+        fi
+        printf "The required package ${YELLOW}jq${NC} was not found .. installing now\n"
+        [[ "$OSTYPE" == "linux-gnu" ]] && sudo apt-get install jq || brew install jq
+    fi
 }
 
 # Set the global environment variables
@@ -106,63 +107,68 @@ fi
 
 
 get_teams() {
-	check_jq
-	printf "We have noticed that you have specified the team ${YELLOW}-t${NC} flag, but have not defined a team\nHere are a list of your teams and their ids in case you did not know them:\n${MAGENTA}"
-	curl --silent https://api.github.com/user/teams?access_token=$GITRIEVAL_TOKEN  | jq '.[] | .id, "name:" + .name, "organisation:" + .organization.login' | sed 'N;N;s/\n/ /g'  | sed 's/\"//g'
-	printf "${YELLOW}Note: you need to provide the team id and not the team name${NC}\n"
-	printf "${NC}Press ${YELLOW}[ENTER]${NC} to skip the team flag and fetch all repositories for the user\n"
-	read -p "Which team id you wish to fetch repositories for: ? " -e TEAM
+    check_jq
+    printf "We have noticed that you have specified the team ${YELLOW}-t${NC} flag, but have not defined a team\nHere are a list of your teams and their ids in case you did not know them:\n${MAGENTA}"
+    curl --silent https://api.github.com/user/teams?access_token=$GITRIEVAL_TOKEN  | jq '.[] | .id, "name:" + .name, "organisation:" + .organization.login' | sed 'N;N;s/\n/ /g'  | sed 's/\"//g'
+    printf "${YELLOW}Note: you need to provide the team id and not the team name${NC}\n"
+    printf "${NC}Press ${YELLOW}[ENTER]${NC} to skip the team flag and fetch all repositories for the user\n"
+    read -p "Which team id you wish to fetch repositories for: ? " -e TEAM
 }
 
 get_organisations() {
-	check_jq
-	printf "We have noticed that you have specified the organisation ${YELLOW}-o${NC} flag, but have not defined an organisation\nHere are a list of your organisations in case you did not know them:\n${MAGENTA}"
-	curl --silent https://api.github.com/user/orgs?access_token=$GITRIEVAL_TOKEN  | sed 's/\\\\\//\//g' | sed 's/[{}]//g' | gawk -v k="text" '{n=split($0,a,","); for (i=1; i<=n; i++) print a[i]}' | sed 's/\"\:\"/\|/g' | sed 's/[\,]/ /g' | sed 's/\"//g' | grep -w login | cut -d "|" -f2
-	printf "${NC}Press ${YELLOW}[ENTER]${NC} to skip the organisation flag and fetch all repositories for the user\n"
-	read -p "Which organisation you wish to fetch repositories for: ? " -e ORGANISATION
+    check_jq
+    printf "We have noticed that you have specified the organisation ${YELLOW}-o${NC} flag, but have not defined an organisation\nHere are a list of your organisations in case you did not know them:\n${MAGENTA}"
+    curl --silent https://api.github.com/user/orgs?access_token=$GITRIEVAL_TOKEN  | sed 's/\\\\\//\//g' | sed 's/[{}]//g' | gawk -v k="text" '{n=split($0,a,","); for (i=1; i<=n; i++) print a[i]}' | sed 's/\"\:\"/\|/g' | sed 's/[\,]/ /g' | sed 's/\"//g' | grep -w login | cut -d "|" -f2
+    printf "${NC}Press ${YELLOW}[ENTER]${NC} to skip the organisation flag and fetch all repositories for the user\n"
+    read -p "Which organisation you wish to fetch repositories for: ? " -e ORGANISATION
 }
 
 # Initialize our own variables:
-OPTIND=1; ORGANISATION=false; TEAM=false; REGEX=false; IS_PRIVATE=false; IS_PUBLIC=false; IS_INTERACTIVE=false; VISIBILITY='all'
+OPTIND=1; ORGANISATION=false; TEAM=false; REGEX=false; IS_PRIVATE=false; IS_PUBLIC=false; IS_INTERACTIVE=false; VISIBILITY='all'; DIRECTORY=".";
 # Parse the options and arguments passed to the function
-while getopts ":o:t:r:pvih" opt; do
+while getopts ":d:o:t:r:pvih" opt; do
     case "$opt" in
-    h) 	grep '#' "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")" | cut -c 2- | head -n +37 | tail -n +2 && exit 0
-		;;
+    h)  grep '#' "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")" | cut -c 2- | head -n +37 | tail -n +2 && exit 0
+        ;;
+    d)  if [[ ${OPTARG:0:1} == '-' ]]; then
+            die "Invalid value $OPTARG given to -$OPTION"
+        fi
+        DIRECTORY=$OPTARG
+        ;;
     o)  if [[ ${OPTARG:0:1} == '-' ]]; then
             die "Invalid value $OPTARG given to -$OPTION"
         fi
-		ORGANISATION=$OPTARG
+        ORGANISATION=$OPTARG
         ;;
     t)  if [[ ${OPTARG:0:1} == '-' ]]; then
             die "Invalid value $OPTARG given to -$OPTION"
         fi
-		TEAM=$OPTARG
+        TEAM=$OPTARG
         ;;
-	r)  if [[ ${OPTARG:0:1} == '-' ]]; then
+    r)  if [[ ${OPTARG:0:1} == '-' ]]; then
             die "Invalid value $OPTARG given to -$OPTION"
         fi
-		REGEX=$OPTARG
+        REGEX=$OPTARG
         ;;
     i)  IS_INTERACTIVE=true
-		;;
+        ;;
     v)  $IS_PUBLIC && die "Cannot retrieve both private and public repos with arguments (FYI: default behaivour is all)"
-		IS_PRIVATE=true
-		VISIBILITY="private"
+        IS_PRIVATE=true
+        VISIBILITY="private"
         ;;
     p)  $IS_PRIVATE && die "Cannot retrieve both private and public repos with arguments (FYI: default behaivour is all)"
-		IS_PUBLIC=true
-		VISIBILITY="public"
-		;;
-	\?) die "Invalid option passed" ;;
-	:)  if [ $OPTARG == "t" ]; then
-			get_teams
-		elif [ $OPTARG == "o" ]; then
-			get_organisations
-		else
-			echo "$0: -$OPTARG needs a value" >&2; exit 2
-		fi
-		;;
+        IS_PUBLIC=true
+        VISIBILITY="public"
+        ;;
+    \?) die "Invalid option passed" ;;
+    :)  if [ $OPTARG == "t" ]; then
+            get_teams
+        elif [ $OPTARG == "o" ]; then
+            get_organisations
+        else
+            echo "$0: -$OPTARG needs a value" >&2; exit 2
+        fi
+        ;;
 
     esac
 done
@@ -172,51 +178,51 @@ shift $((OPTIND-1))
 
 # Given a list of repos URLs .. clone or pull and update the list
 get_repos() {
-	echo "Beaming down all the repositories now ..."
-	for repository in $@
-	do
-		REPOSITORY_NAME=`echo $(basename $repository) | cut -d"." -f1`
-		# Check if the URI matches a pattern if defined
-		if [[ $REGEX != false ]]; then
-			! [[ $repository =~ $REGEX ]] && printf "\nSkipping ${RED}$REPOSITORY_NAME${NC} as it does not match the regex filter" && continue
-		fi
-		if [[ $IS_INTERACTIVE == true ]]; then
-			echo ""
-	    	printf "Do you need to clone repository: ${MAGENTA}${REPOSITORY_NAME}${NC}? [Y/N] " && read -n1;
-	    	if [[ $REPLY =~ ^[yY]$ ]]; then
-	    		echo ""
-	    		[ -d "$REPOSITORY_NAME" ] && printf "\n${RED}Repository already exists .. pulling new changes${NC}\n" && git -C "$REPOSITORY_NAME" pull origin master || git clone "http://$(echo $repository|sed -e 's/\\n//g')"
-	    	fi
-	    else
-	    	[ -d "$REPOSITORY_NAME" ] && printf "\n${RED}Repository already exists .. pulling new changes${NC}\n" && git -C "$REPOSITORY_NAME" pull origin master || git clone "http://$(echo $repository|sed -e 's/\\n//g')"
-    	fi
-	done
+    echo "Beaming down all the repositories now ..."
+    for repository in $@
+    do
+        REPOSITORY_NAME=`echo $(basename $repository) | cut -d"." -f1`
+        # Check if the URI matches a pattern if defined
+        if [[ $REGEX != false ]]; then
+            ! [[ $repository =~ $REGEX ]] && printf "\nSkipping ${RED}$REPOSITORY_NAME${NC} as it does not match the regex filter" && continue
+        fi
+        if [[ $IS_INTERACTIVE == true ]]; then
+            echo ""
+            printf "Do you need to clone repository: ${MAGENTA}${REPOSITORY_NAME}${NC}? [Y/N] " && read -n1;
+            if [[ $REPLY =~ ^[yY]$ ]]; then
+                echo ""
+                [ -d "$DIRECTORY/$REPOSITORY_NAME" ] && printf "\n${RED}Repository already exists .. pulling new changes${NC}\n" && git -C "$DIRECTORY/$REPOSITORY_NAME" pull origin master || git clone "http://$(echo $repository|sed -e 's/\\n//g')" "$DIRECTORY/$REPOSITORY_NAME"
+            fi
+        else
+            [ -d "$DIRECTORY/$REPOSITORY_NAME" ] && printf "\n${RED}Repository already exists .. pulling new changes${NC}\n" && git -C "$DIRECTORY/$REPOSITORY_NAME" pull origin master || git clone "http://$(echo $repository|sed -e 's/\\n//g')" "$DIRECTORY/$REPOSITORY_NAME"
+        fi
+    done
 }
 
 # Iteratively request data from an API endpoint
 request_github_api() {
-	GITHUB_PAGE=1
-	until [[ $IS_PAGINATED == false ]]; do
-		REPOS=$(curl --silent -i -H "Authorization: token ${GITRIEVAL_TOKEN}" "https://api.github.com/${1}&per_page=100&page=${GITHUB_PAGE}" | gawk -v RS=',"' -F: '/^clone_url/ {print $3}' | sed 's/["]//g' | cut -c 3-)
-		REPOLIST+="\n${REPOS}"
-		printf "Retrieving batch: ${GITHUB_PAGE} of repositores --> ${YELLOW} `echo "$REPOLIST" | wc -l` ${NC} processed so far\n"
-		if [[ -n $REPOS ]]; then
-    		(( GITHUB_PAGE++ ))
-		else
-		    printf "Finished retreiving allrepositores with Total: ${YELLOW} `echo "$REPOLIST" | wc -l` ${NC}\n"
-		    IS_PAGINATED=false
-		fi
-	done
-	get_repos $REPOLIST
+    GITHUB_PAGE=1
+    until [[ $IS_PAGINATED == false ]]; do
+        REPOS=$(curl --silent -i -H "Authorization: token ${GITRIEVAL_TOKEN}" "https://api.github.com/${1}&per_page=100&page=${GITHUB_PAGE}" | gawk -v RS=',"' -F: '/^clone_url/ {print $3}' | sed 's/["]//g' | cut -c 3-)
+        REPOLIST+="\n${REPOS}"
+        printf "Retrieving batch: ${GITHUB_PAGE} of repositores --> ${YELLOW} `echo "$REPOLIST" | wc -l` ${NC} processed so far\n"
+        if [[ -n $REPOS ]]; then
+            (( GITHUB_PAGE++ ))
+        else
+            printf "Finished retreiving allrepositores with Total: ${YELLOW} `echo "$REPOLIST" | wc -l` ${NC}\n"
+            IS_PAGINATED=false
+        fi
+    done
+    get_repos $REPOLIST
 }
 
 if [[ $ORGANISATION != false && -n $ORGANISATION ]]; then
-	printf "Retreiving ${RED}${VISIBILITY}${NC} repositories for organisation: ${ORGANISATION}\n"
-	request_github_api "orgs/$ORGANISATION/repos?type=${VISIBILITY}"
+    printf "Retreiving ${RED}${VISIBILITY}${NC} repositories for organisation: ${ORGANISATION}\n"
+    request_github_api "orgs/$ORGANISATION/repos?type=${VISIBILITY}"
 elif [[ $TEAM != false && -n $TEAM ]]; then
-	printf "Retreiving ${RED}${VISIBILITY}${NC} repositories for team: ${TEAM}\n"
-	request_github_api "teams/$TEAM/repos?visibility=${VISIBILITY}"
+    printf "Retreiving ${RED}${VISIBILITY}${NC} repositories for team: ${TEAM}\n"
+    request_github_api "teams/$TEAM/repos?visibility=${VISIBILITY}"
 else
-	printf "Since no team or organisation were defined, retreiving ${RED}${VISIBILITY}${NC} repositories for the user\n"
-	request_github_api "user/repos?visibility=${VISIBILITY}"
+    printf "Since no team or organisation were defined, retreiving ${RED}${VISIBILITY}${NC} repositories for the user\n"
+    request_github_api "user/repos?visibility=${VISIBILITY}"
 fi
