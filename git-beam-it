@@ -201,16 +201,21 @@ get_repos() {
 
 # Iteratively request data from an API endpoint
 request_github_api() {
-    GITHUB_PAGE=1
+    GITHUB_PAGE=1;
     until [[ $IS_PAGINATED == false ]]; do
         REPOS=$(curl --silent -i -H "Authorization: token ${GITRIEVAL_TOKEN}" "https://api.github.com/${1}&per_page=100&page=${GITHUB_PAGE}" | gawk -v RS=',"' -F: '/^clone_url/ {print $3}' | sed 's/["]//g' | cut -c 3-)
-        REPOLIST+="\n${REPOS}"
-        printf "Retrieving batch: ${GITHUB_PAGE} of repositores --> ${YELLOW} `echo "$REPOLIST" | wc -l` ${NC} processed so far\n"
-        if [[ -n $REPOS ]]; then
-            (( GITHUB_PAGE++ ))
+        if [[ -n "${REPOS/[ ]*\n/}" ]] || [[ ! $GITHUB_PAGE = 1 ]]
+        then
+            REPOLIST+="\n${REPOS}";
+            printf "Retrieving batch: ${GITHUB_PAGE} of repositories --> ${YELLOW} `echo "$REPOLIST" | wc -l` ${NC} processed so far\n";
+            if [[ -n $REPOS ]]; then
+                (( GITHUB_PAGE++ ))
+            else
+                printf "Finished retrieving all repositories with Total: ${YELLOW} `echo "$REPOLIST" | wc -l` ${NC}\n";
+                IS_PAGINATED=false;
+            fi
         else
-            printf "Finished retreiving allrepositores with Total: ${YELLOW} `echo "$REPOLIST" | wc -l` ${NC}\n"
-            IS_PAGINATED=false
+            printf "${RED}ERROR:${NC} Seems like the request to Github API failed .. make sure you have passed correct values to the command .. sometimes its just Github's fault :(\n" && exit
         fi
     done
     get_repos $REPOLIST
