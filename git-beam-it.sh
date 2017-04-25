@@ -204,6 +204,9 @@ request_github_api() {
     GITHUB_PAGE=1;
     until [[ $IS_PAGINATED == false ]]; do
         REPOS=$(curl --silent -i -H "Authorization: token ${GITRIEVAL_TOKEN}" "https://api.github.com/${1}&per_page=100&page=${GITHUB_PAGE}" | gawk -v RS=',"' -F: '/^clone_url/ {print $3}' | sed 's/["]//g' | cut -c 3-)
+        if [[ -n "${REPOS/[ ]*\n/}" ]]; then
+            REPOS=$(curl --silent -i -H "Authorization: token ${GITRIEVAL_TOKEN}" "https://api.github.com/${1}&per_page=100&page=${GITHUB_PAGE}" | grep "\"clone_url\"" | gawk -F': "' '{print $2}' | sed -e 's/",//g' | cut -c 9-)
+        fi
         if [[ -n "${REPOS/[ ]*\n/}" ]] || [[ ! $GITHUB_PAGE = 1 ]]
         then
             REPOLIST+="\n${REPOS}";
