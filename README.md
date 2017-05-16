@@ -47,6 +47,7 @@ Options:
 -d             directory       specify a directory to clone all the repositories into **without a trailing slash** e.g. `/temp`
 -p             pulbic          clone only public repositories (note that this does not work for teams)
 -v             private         clone only private repositories (note that this does not work for teams)
+-s             ssh             clone github repos over ssh and not https (this will use the SSH keys if uploaded to Github and will prevent the password prompt)
 -r             regex           filter repositories based on this regex
 -t <teamId>    team            clone only repositories belonging to this specific team id
 -o <orgName>   organisation    clone only repositories belonging to this specific organisation name

@@ -20,6 +20,7 @@
 # -p             pulbic          clone only public repositories (note that this does not work for teams)
 # -v             private         clone only private repositories (note that this does not work for teams)
 # -r             regex           filter repositories based on this regex
+# -s             ssh             clone github repos over ssh and not https (this will use the SSH keys if uploaded to Github and will prevent the password prompt)
 # -t <teamId>    team            clone only repositories belonging to this specific team id
 # -o <orgName>   organisation    clone only repositories belonging to this specific organisation name
 #
@@ -124,9 +125,9 @@ get_organisations() {
 }
 
 # Initialize our own variables:
-OPTIND=1; ORGANISATION=false; TEAM=false; REGEX=false; IS_PRIVATE=false; IS_PUBLIC=false; IS_INTERACTIVE=false; VISIBILITY='all'; DIRECTORY=".";
+OPTIND=1; ORGANISATION=false; TEAM=false; REGEX=false; IS_PRIVATE=false; IS_PUBLIC=false; IS_INTERACTIVE=false; VISIBILITY='all'; DIRECTORY="."; IS_SSH=false;
 # Parse the options and arguments passed to the function
-while getopts ":d:o:t:r:pvih" opt; do
+while getopts ":d:o:t:r:pvihs" opt; do
     case "$opt" in
     h)  grep '#' "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")" | cut -c 2- | head -n +37 | tail -n +2 && exit 0
         ;;
@@ -151,6 +152,8 @@ while getopts ":d:o:t:r:pvih" opt; do
         REGEX=$OPTARG
         ;;
     i)  IS_INTERACTIVE=true
+        ;;
+    s)  IS_SSH=true
         ;;
     v)  $IS_PUBLIC && die "Cannot retrieve both private and public repos with arguments (FYI: default behaivour is all)"
         IS_PRIVATE=true
@@ -181,7 +184,13 @@ get_repos() {
     echo "Beaming down all the repositories now ..."
     for repository in $@
     do
+        echo $repository|sed -e 's/\\n//g'
         REPOSITORY_NAME=`echo $(basename $repository) | cut -d"." -f1`
+        if [[ $IS_SSH == true ]]; then
+            REPOSITOY_URL="git+ssh://git@github.com:$(echo $repository | awk -F 'github.com' '{print $2}')"
+        else
+            REPOSITOY_URL="http://$(echo $repository|sed -e 's/\\n//g')" "$DIRECTORY/$REPOSITORY_NAME"
+        fi
         # Check if the URI matches a pattern if defined
         if [[ $REGEX != false ]]; then
             ! [[ $repository =~ $REGEX ]] && printf "\nSkipping ${RED}$REPOSITORY_NAME${NC} as it does not match the regex filter" && continue
@@ -191,10 +200,10 @@ get_repos() {
             printf "Do you need to clone repository: ${MAGENTA}${REPOSITORY_NAME}${NC}? [Y/N] " && read -n1;
             if [[ $REPLY =~ ^[yY]$ ]]; then
                 echo ""
-                [ -d "$DIRECTORY/$REPOSITORY_NAME" ] && printf "\n${RED}Repository already exists .. pulling new changes${NC}\n" && git -C "$DIRECTORY/$REPOSITORY_NAME" pull origin master || git clone "http://$(echo $repository|sed -e 's/\\n//g')" "$DIRECTORY/$REPOSITORY_NAME"
+                [ -d "$DIRECTORY/$REPOSITORY_NAME" ] && printf "\n${RED}Repository already exists .. pulling new changes${NC}\n" && git -C "$DIRECTORY/$REPOSITORY_NAME" pull origin master || git clone $REPOSITOY_URL
             fi
         else
-            [ -d "$DIRECTORY/$REPOSITORY_NAME" ] && printf "\n${RED}Repository already exists .. pulling new changes${NC}\n" && git -C "$DIRECTORY/$REPOSITORY_NAME" pull origin master || git clone "http://$(echo $repository|sed -e 's/\\n//g')" "$DIRECTORY/$REPOSITORY_NAME"
+            [ -d "$DIRECTORY/$REPOSITORY_NAME" ] && printf "\n${RED}Repository already exists .. pulling new changes${NC}\n" && git -C "$DIRECTORY/$REPOSITORY_NAME" pull origin master || git clone $REPOSITOY_URL
         fi
     done
 }
