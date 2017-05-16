@@ -200,10 +200,10 @@ get_repos() {
             printf "Do you need to clone repository: ${MAGENTA}${REPOSITORY_NAME}${NC}? [Y/N] " && read -n1;
             if [[ $REPLY =~ ^[yY]$ ]]; then
                 echo ""
-                [ -d "$DIRECTORY/$REPOSITORY_NAME" ] && printf "\n${RED}Repository already exists .. pulling new changes${NC}\n" && git -C "$DIRECTORY/$REPOSITORY_NAME" pull origin master || git clone $REPOSITOY_URL
+                [ -d "$DIRECTORY/$REPOSITORY_NAME" ] && printf "\n${RED}Repository already exists .. pulling new changes${NC}\n" && git -C "$DIRECTORY/$REPOSITORY_NAME" pull origin master || git clone $REPOSITOY_URL "$DIRECTORY/$REPOSITORY_NAME"
             fi
         else
-            [ -d "$DIRECTORY/$REPOSITORY_NAME" ] && printf "\n${RED}Repository already exists .. pulling new changes${NC}\n" && git -C "$DIRECTORY/$REPOSITORY_NAME" pull origin master || git clone $REPOSITOY_URL
+            [ -d "$DIRECTORY/$REPOSITORY_NAME" ] && printf "\n${RED}Repository already exists .. pulling new changes${NC}\n" && git -C "$DIRECTORY/$REPOSITORY_NAME" pull origin master || git clone $REPOSITOY_URL "$DIRECTORY/$REPOSITORY_NAME"
         fi
     done
 }
