@@ -125,9 +125,9 @@ get_organisations() {
 }
 
 # Initialize our own variables:
-OPTIND=1; ORGANISATION=false; TEAM=false; REGEX=false; IS_PRIVATE=false; IS_PUBLIC=false; IS_INTERACTIVE=false; VISIBILITY='all'; DIRECTORY="."; IS_SSH=false;
+OPTIND=1; ORGANISATION=false; TEAM=false; REGEX=false; IS_INTERACTIVE=false; TYPE='all'; DIRECTORY="."; IS_SSH=false;
 # Parse the options and arguments passed to the function
-while getopts ":d:o:t:r:pvihs" opt; do
+while getopts ":d:o:t:r:p:ihs" opt; do
     case "$opt" in
     h)  grep '#' "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")" | cut -c 2- | head -n +37 | tail -n +2 && exit 0
         ;;
@@ -135,6 +135,11 @@ while getopts ":d:o:t:r:pvihs" opt; do
             die "Invalid value $OPTARG given to -$OPTION"
         fi
         DIRECTORY=$OPTARG
+        ;;
+    p)  if [[ ${OPTARG:0:1} == '-' ]]; then
+            die "Invalid value $OPTARG given to -$OPTION"
+        fi
+        TYPE=$OPTARG
         ;;
     o)  if [[ ${OPTARG:0:1} == '-' ]]; then
             die "Invalid value $OPTARG given to -$OPTION"
@@ -154,14 +159,6 @@ while getopts ":d:o:t:r:pvihs" opt; do
     i)  IS_INTERACTIVE=true
         ;;
     s)  IS_SSH=true
-        ;;
-    v)  $IS_PUBLIC && die "Cannot retrieve both private and public repos with arguments (FYI: default behaivour is all)"
-        IS_PRIVATE=true
-        VISIBILITY="private"
-        ;;
-    p)  $IS_PRIVATE && die "Cannot retrieve both private and public repos with arguments (FYI: default behaivour is all)"
-        IS_PUBLIC=true
-        VISIBILITY="public"
         ;;
     \?) die "Invalid option passed" ;;
     :)  if [ $OPTARG == "t" ]; then
@@ -187,10 +184,11 @@ get_repos() {
         echo $repository|sed -e 's/\\n//g'
         REPOSITORY_NAME=`echo $(basename $repository) | cut -d"." -f1`
         if [[ $IS_SSH == true ]]; then
-            REPOSITOY_URL="git+ssh://git@github.com:$(echo $repository | awk -F 'github.com' '{print $2}')"
+            REPOSITOY_URL="git+ssh://git@github.com:$(echo $repository | awk -F 'github.com' '{print $2}' |sed -e 's/\\n//g')"
         else
-            REPOSITOY_URL="http://$(echo $repository|sed -e 's/\\n//g')" "$DIRECTORY/$REPOSITORY_NAME"
+            REPOSITOY_URL="http://$(echo $repository |sed -e 's/\\n//g')"
         fi
+
         # Check if the URI matches a pattern if defined
         if [[ $REGEX != false ]]; then
             ! [[ $repository =~ $REGEX ]] && printf "\nSkipping ${RED}$REPOSITORY_NAME${NC} as it does not match the regex filter" && continue
@@ -234,12 +232,12 @@ request_github_api() {
 }
 
 if [[ $ORGANISATION != false && -n $ORGANISATION ]]; then
-    printf "Retreiving ${RED}${VISIBILITY}${NC} repositories for organisation: ${ORGANISATION}\n"
-    request_github_api "orgs/$ORGANISATION/repos?type=${VISIBILITY}"
+    printf "Retreiving ${RED}${TYPE}${NC} repositories for organisation: ${ORGANISATION}\n"
+    request_github_api "orgs/$ORGANISATION/repos?type=${TYPE}"
 elif [[ $TEAM != false && -n $TEAM ]]; then
-    printf "Retreiving ${RED}${VISIBILITY}${NC} repositories for team: ${TEAM}\n"
-    request_github_api "teams/$TEAM/repos?visibility=${VISIBILITY}"
+    printf "Retreiving ${RED}${TYPE}${NC} repositories for team: ${TEAM}\n"
+    request_github_api "teams/$TEAM/repos?visibility=${TYPE}"
 else
-    printf "Since no team or organisation were defined, retreiving ${RED}${VISIBILITY}${NC} repositories for the user\n"
-    request_github_api "user/repos?visibility=${VISIBILITY}"
+    printf "Since no team or organisation were defined, retreiving ${RED}${TYPE}${NC} repositories for the user\n"
+    request_github_api "user/repos?type=${TYPE}"
 fi
