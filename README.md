@@ -44,6 +44,7 @@ Usage: beamit <options>
 Options:
 -h             help            show help
 -i             interactive     interactive clone mode. The user will be prompted before cloning each repo
+-d             directory       specify a directory to clone all the repositories into **without a trailing slash** e.g. `/temp`
 -p             pulbic          clone only public repositories (note that this does not work for teams)
 -v             private         clone only private repositories (note that this does not work for teams)
 -r             regex           filter repositories based on this regex
