@@ -1,12 +1,12 @@
 #!/bin/bash
 
 #
-# Beam-it: Bulk clone Github Repositories
-# This bash script will bulk clone Github repositories for a specific user/organisation or team
+# Beam-it: Bulk clone GitHub Repositories
+# This bash script will bulk clone GitHub repositories for a specific user/organisation or team
 #
 # The script will automatically configure itself by asking the user to enter some required information
-# in order to be able to communicate with the Github API
-# When running the script for the first time, the user will be prompted to enter his Github username and API personal access token
+# in order to be able to communicate with the GitHub API
+# When running the script for the first time, the user will be prompted to enter his GitHub username and API personal access token
 # For more information on API personal access tokens: https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/
 #
 # Note: After first setup, you might need to source your .bash_profile, .bashrc or .zshrc in order for the variables export to take effect and not to be prompted again
@@ -17,14 +17,14 @@
 # -h             help            show help
 # -i             interactive     interactive clone mode. The user will be prompted before cloning each repo
 # -d             directory       specify a directory to clone all the repositories into
-# -p             pulbic          clone only public repositories (note that this does not work for teams)
+# -p             public          clone only public repositories (note that this does not work for teams)
 # -v             private         clone only private repositories (note that this does not work for teams)
 # -r             regex           filter repositories based on this regex
-# -s             ssh             clone github repos over ssh and not https (this will use the SSH keys if uploaded to Github and will prevent the password prompt)
+# -s             ssh             clone GitHub repos over ssh and not https (this will use the SSH keys if uploaded to GitHub and will prevent the password prompt)
 # -t <teamId>    team            clone only repositories belonging to this specific team id
 # -o <orgName>   organisation    clone only repositories belonging to this specific organisation name
 #
-# If the paramteres -t and -o have been left empty, then the script will fetch the list of ogranisations and teams for that specific user
+# If the parameteres -t and -o have been left empty, then the script will fetch the list of organisations and teams for that specific user
 # The user will then be prompted to enter the organisation name or team id or just skip to fetch all repositories
 #
 # Examples:
@@ -35,7 +35,7 @@
 # Clone interactively all the public repos that match the regex .*SeedJobs.* (any repo that contain SeedJobs)
 # git beam-it -i -r .*SeedJobs.*
 #
-# Clone all the public repositores for organisation SeedJobs
+# Clone all the public repositories for organisation SeedJobs
 # git beam-it -p -o SeedJobs
 #
 
