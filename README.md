@@ -6,7 +6,7 @@ The script will automatically configure itself by asking the user to enter some 
 
 > The script has no external dependencies except for [jq](https://stedolan.github.io/jq/) which is only required to parse the team list.
 
-![beam-it](https://dl.dropboxusercontent.com/u/5258344/Blog/git-beam-it%20public.gif)
+![beam-it](https://s22.postimg.cc/a6qx9bsdt/git-beam-it_public.gif)
 
 When running the script for the first time, the user will be prompted to enter his Github username and API personal access token. For more information on API personal access tokens, check this [Github tutorial](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/)
 
@@ -53,7 +53,7 @@ Options:
 
 If the paramteres `-t` and `-o` have been left empty, then the script will fetch the list of ogranisations and teams for that specific user, the user will then be prompted to enter the organisation name or team id or just skip to fetch all repositories.
 
-![beam-it setup](https://dl.dropboxusercontent.com/u/5258344/Blog/git-beam-it%20setup.gif)
+![beam-it setup](https://i.imgur.com/RtvVp4V.gif)
 
 ### Examples:
 
@@ -67,10 +67,10 @@ git beam-it -i -r .*SeedJobs.*
 # Clone all the public repositores for organisation SeedJobs
 git beam-it -p -o SeedJobs
 ```
-![beam-it team](https://dl.dropboxusercontent.com/u/5258344/Blog/git-beam-it%20team.gif)
+![beam-it team](https://s22.postimg.cc/8exyefw69/git-beam-it_team.gif)
 
 > beam-it prompts the user to select from his list of teams if no team id was defined
 
-![beam-it regex](https://dl.dropboxusercontent.com/u/5258344/Blog/git-beam-it%20regex.gif)
+![beam-it regex](https://s22.postimg.cc/qhr15nzqp/git-beam-it_regex.gif)
 
 > beam-it can filter repos by a passed regex and will exclude those that do not match
