@@ -182,7 +182,8 @@ get_repos() {
     for repository in $@
     do
         echo $repository|sed -e 's/\\n//g'
-        REPOSITORY_NAME=`echo $(basename $repository) | cut -d"." -f1`
+        FILENAME=${repository##*/}
+        REPOSITORY_NAME=${FILENAME%.*}
         if [[ $IS_SSH == true ]]; then
             REPOSITOY_URL="git+ssh://git@github.com:$(echo $repository | awk -F 'github.com' '{print $2}' |sed -e 's/\\n//g')"
         else
