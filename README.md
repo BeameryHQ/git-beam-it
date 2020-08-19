@@ -28,6 +28,14 @@ Installation with `curl`:
 curl -L -O https://raw.githubusercontent.com/SeedJobs/git-beam-it/master/git-beam-it && sudo mv git-beam-it /usr/local/bin/ && sudo chmod +x /usr/local/bin/git-beam-it
 ```
 
+Installation with 'curl' on 'Git for Windows'
+Create/Move to local directory within Git for Windows and run...
+```bash
+curl -L -O https://raw.githubusercontent.com/SeedJobs/git-beam-it/master/git-beam-it && chmod +x git-beam-it
+```
+...then run ./git-beam-it inside the same directory to execute script.
+
+
 Installation with `wget`:
 
 ```bash
@@ -40,6 +48,11 @@ sudo wget -P /usr/local/bin https://raw.githubusercontent.com/SeedJobs/git-beam-
 
 ```bash
 Usage: git beam-it <options>
+```
+
+Git for Windows Version:
+```bash
+Usage: ./git-beam-it <options>
 ```
 
 #### Options
