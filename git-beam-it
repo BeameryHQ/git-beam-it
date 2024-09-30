@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2059
 
 #
 # Beam-it: Bulk clone Github Repositories
@@ -75,20 +76,28 @@ set_environment_variable() {
 # @function get_teams
 # @description get the list of teams from Github profile for an organisation
 get_teams() {
-    printf "We have noticed that you have specified the team ${YELLOW}-t${NC} flag, but have not defined a team\nHere are a list of your teams and their ids in case you did not know them:\n${MAGENTA}"
-    curl --silent https://api.github.com/user/teams?access_token=$GITRIEVAL_TOKEN  | jq '.[] | .id, "name:" + .name, "organisation:" + .organization.login' | sed 'N;N;s/\n/ /g'  | sed 's/\"//g'
-    printf "${YELLOW}Note: you need to provide the team id and not the team name${NC}\n"
-    printf "${NC}Press ${YELLOW}[ENTER]${NC} to skip the team flag and fetch all repositories for the user\n"
-    read -p "Which team id you wish to fetch repositories for: ? " -e TEAM
+    printf "%s ${YELLOW}%s${NC} %s\n" "We have noticed that you have specified the team" "-t" "flag but have not defined a team"
+    printf "%s${MAGENTA}\n\n" "Here are a list of your teams and their ids in case you did not know them:"
+    
+    curl --silent -H "Authorization: token $GITRIEVAL_TOKEN" https://api.github.com/user/teams  | jq '.[] | .id, "name:" + .name, "organisation:" + .organization.login' | sed 'N;N;s/\n/ /g'  | sed 's/\"//g'
+    
+    printf "\n\n${YELLOW}%s${NC}\n" "Note: you need to provide the team id and not the team name"
+    printf "%s${YELLOW}%s${NC}%s\n" "Press" "[ENTER]" "to skip the team flag and fetch all repositories for the user"
+    
+    read -rp "Which team id you wish to fetch repositories for: ? " -e TEAM
 }
 
 # @function get_organisations
 # @description get the list of organisation for a Github profile
 get_organisations() {
-    printf "We have noticed that you have specified the organisation ${YELLOW}-o${NC} flag, but have not defined an organisation\nHere are a list of your organisations in case you did not know them:\n${MAGENTA}"
-    curl --silent https://api.github.com/user/orgs?access_token=$GITRIEVAL_TOKEN  | sed 's/\\\\\//\//g' | sed 's/[{}]//g' | gawk -v k="text" '{n=split($0,a,","); for (i=1; i<=n; i++) print a[i]}' | sed 's/\"\:\"/\|/g' | sed 's/[\,]/ /g' | sed 's/\"//g' | grep -w login | cut -d "|" -f2
-    printf "${NC}Press ${YELLOW}[ENTER]${NC} to skip the organisation flag and fetch all repositories for the user\n"
-    read -p "Which organisation you wish to fetch repositories for: ? " -e ORGANISATION
+    printf "%s ${YELLOW}%s${NC} %s\n" "We have noticed that you have specified the organisation" "-o" "flag, but have not defined an organisation"
+    printf "%s${MAGENTA}\n\n" "Here are a list of your organisations in case you did not know them:"
+    
+    curl --silent -H "Authorization: token $GITRIEVAL_TOKEN" https://api.github.com/user/orgs  | sed 's/\\\\\//\//g' | sed 's/[{}]//g' | gawk -v k="text" '{n=split($0,a,","); for (i=1; i<=n; i++) print a[i]}' | sed 's/\"\:\"/\|/g' | sed 's/[\,]/ /g' | sed 's/\"//g' | grep -w login | cut -d "|" -f2
+    
+    printf "\n${NC}Press ${YELLOW}[ENTER]${NC} to skip the organisation flag and fetch all repositories for the user\n"
+    
+    read -rp "Which organisation you wish to fetch repositories for: ? " -e ORGANISATION
 }
 
 # @function get_repos
@@ -245,3 +254,4 @@ else
     printf "%s${RED}%s${NC}%s\n" "Since no team or organisation were defined, retreiving" " ${TYPE} " "repositories for the user"
     request_github_api "user/repos?type=${TYPE}"
 fi
+
