@@ -10,7 +10,7 @@ When running the script for the first time, the user will be prompted to enter h
 
 ## Repositories Refresh
 
-When cloning, if the repository already exists then the script will perfrom a `git pull` assuming that the remote is `origin` and will update the local `master branch
+When cloning, if the repository already exists then the script will perfrom a `git pull` assuming that the remote is `origin` and will update the local `master` branch
 
 ## Installation
 
@@ -36,8 +36,6 @@ sudo wget -P /usr/local/bin https://raw.githubusercontent.com/SeedJobs/git-beam-
 
 > Note: After first setup, you might need to source your .bash_profile, .bashrc or .zshrc in order for the variables export to take effect and not to be prompted again
 
-![beam-it](https://camo.githubusercontent.com/cd17fa04b4f7840feecb85049c4f2341bfc388a39b2839aca3c118e5e3256986/68747470733a2f2f7332322e706f7374696d672e63632f6136717839627364742f6769742d6265616d2d69745f7075626c69632e676966)
-
 ```bash
 Usage: git beam-it <options>
 ```
@@ -57,8 +55,6 @@ Usage: git beam-it <options>
 
 If the paramteres `-t` and `-o` have been left empty, then the script will fetch the list of ogranisations and teams for that specific user, the user will then be prompted to enter the organisation name or team id or just skip to fetch all repositories.
 
-![beam-it setup](https://camo.githubusercontent.com/8cb9cf235524b08d9b3a45e6839a6ff19aa87c892931b38b3f31bdfa33cda848/68747470733a2f2f692e696d6775722e636f6d2f527476567034562e676966)
-
 ### Examples:
 
 ```bash
@@ -76,8 +72,6 @@ git beam-it -d ~/temp -s -t
 ```
 
 > the paramteres `-t` and `-o` are mutually exclusive .. make sure you only execute the command for a specific team or organisation.
-
-![beam-it team](https://camo.githubusercontent.com/70b8e1b0ed22b70c42e9a8b04f9fb3b0828ebf8ae84f53f28168147ed7f30de5/68747470733a2f2f7332322e706f7374696d672e63632f3865787965667736392f6769742d6265616d2d69745f7465616d2e676966)
 
 > beam-it prompts the user to select from his list of teams if no team id was defined
 
