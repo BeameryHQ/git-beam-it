@@ -73,8 +73,6 @@ git beam-it -d ~/temp -s -t
 
 > the paramteres `-t` and `-o` are mutually exclusive .. make sure you only execute the command for a specific team or organisation.
 
-![beam-it team](https://camo.githubusercontent.com/70b8e1b0ed22b70c42e9a8b04f9fb3b0828ebf8ae84f53f28168147ed7f30de5/68747470733a2f2f7332322e706f7374696d672e63632f3865787965667736392f6769742d6265616d2d69745f7465616d2e676966)
-
 > beam-it prompts the user to select from his list of teams if no team id was defined
 
 ### Known Issues
